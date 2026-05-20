@@ -1,0 +1,91 @@
+- name: Provision EC2 Server and Deploy Monitoring Stack
+  hosts: webservers
+  become: true
+  tasks:
+
+    # ==========================================
+    # PHASE 1: INSTALL DOCKER ENGINE
+    # ==========================================
+    - name: Update apt repository cache
+      apt:
+        update_cache: yes
+
+    - name: Install prerequisite packages
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+        state: present
+
+    - name: Add Docker official GPG apt key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker repository to sources
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_facts['distribution_release'] }} stable
+        state: present
+
+    - name: Install Docker Engine components
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+        update_cache: yes
+
+    - name: Ensure Docker daemon is running and enabled on boot
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Map 'ubuntu' system user to docker privileges group
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+    # ==========================================
+    # PHASE 2: DEPLOY PROMETHEUS & GRAFANA
+    # ==========================================
+    - name: Create Prometheus configuration directory
+      file:
+        path: /etc/prometheus
+        state: directory
+        mode: '0755'
+
+    - name: Deploy default Prometheus config file
+      copy:
+        dest: /etc/prometheus/prometheus.yml
+        content: |
+          global:
+            scrape_interval: 15s
+          scrape_configs:
+            - job_name: 'prometheus'
+              static_configs:
+                - targets: ['localhost:9090']
+            - job_name: 'kubernetes-pods'
+              static_configs:
+                - targets: ['192.168.49.2:8443']
+
+    - name: Launch Prometheus Container
+      command: >
+        docker run -d --name prometheus 
+        -p 9090:9090 
+        -v /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml 
+        --restart unless-stopped 
+        prom/prometheus:latest
+      ignore_errors: yes
+
+    - name: Launch Grafana Container
+      command: >
+        docker run -d --name grafana 
+        -p 3000:3000 
+        --restart unless-stopped 
+        grafana/grafana:latest
+      ignore_errors: yes

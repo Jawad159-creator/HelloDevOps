@@ -1,0 +1,98 @@
+# --- Terraform (Infrastructure) ---
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.backup
+*.tfvars
+
+# --- Node/Frontend (Dependencies) ---
+node_modules/
+dist/
+build/
+.env
+
+# --- Kubernetes/Minikube ---
+.minikube/
+.kube/
+
+# --- DevOps & IDE ---
+.DS_Store
+.vscode/
+.idea/
+*.pem
+*.log
+*.tmp
+
+# ===============================
+# Node.js (Frontend & Backend)
+# ===============================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+build/
+coverage/
+
+# ===============================
+# Environment Files
+# ===============================
+.env
+.env.*
+*.local
+
+# ===============================
+# Logs & Temp Files
+# ===============================
+*.log
+*.tmp
+*.cache
+
+# ===============================
+# IDE / Editor
+# ===============================
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# ===============================
+# OS Files
+# ===============================
+.DS_Store
+Thumbs.db
+
+# ===============================
+# Terraform (VERY IMPORTANT)
+# ===============================
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+*.tfvars
+
+# ===============================
+# Keys / Secrets (CRITICAL)
+# ===============================
+*.pem
+*.key
+*.crt
+
+# ===============================
+# Docker
+# ===============================
+docker-compose.override.yml
+
+# ===============================
+# Misc
+# ===============================
+*.exe
+
+@"
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+"@ | Out-File -FilePath .gitignore -Encoding utf8
