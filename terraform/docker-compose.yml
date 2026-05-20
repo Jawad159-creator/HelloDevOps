@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  backend:
+    image: jawadawan/ayeshalabfinal-backend:latest
+    ports:
+      - "5000:5000"
+  frontend:
+    image: jawadawan/ayeshalabfinal-frontend:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
